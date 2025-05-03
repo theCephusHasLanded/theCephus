@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 18, 18, 18;
+  --background-rgb: 245, 245, 245;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 245, 245, 245;
+    --background-rgb: 18, 18, 18;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
+
+/* Custom bg-radial-gradient utility */
+.bg-radial-gradient {
+  background: radial-gradient(
+    circle at center,
+    transparent 0%,
+    rgba(18, 18, 18, 0.6) 80%,
+    rgba(18, 18, 18, 0.8) 100%
+  );
+}
+
+/* Scanlines effect */
+.scanlines {
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+
+/* Terminal text effect */
+.terminal-text {
+  font-family: 'Courier New', monospace;
+  color: #e0e0e0;
+  text-shadow: 0 0 5px rgba(224, 224, 224, 0.7);
+}
+
+/* Cyber neon effect */
+.cyber-neon {
+  text-shadow: 0 0 5px rgba(224, 224, 224, 0.7),
+                0 0 10px rgba(224, 224, 224, 0.5);
+}
+
+/* Cyber card with glowing border */
+.cyber-card {
+  @apply relative rounded-lg overflow-hidden border border-accent/50;
+  box-shadow: 0 0 10px rgba(224, 224, 224, 0.3);
+}
+
+.cyber-card::before {
+  content: '';
+  @apply absolute inset-0 pointer-events-none;
+  background: linear-gradient(130deg, 
+    rgba(224, 224, 224, 0.1) 0%, 
+    rgba(224, 224, 224, 0) 40%, 
+    rgba(160, 160, 160, 0) 60%, 
+    rgba(160, 160, 160, 0.1) 100%);
+}
+
+.cyber-card:hover {
+  box-shadow: 0 0 15px rgba(224, 224, 224, 0.5),
+              0 0 20px rgba(160, 160, 160, 0.3);
+}
+
+/* Interface elements */
+.cyber-input {
+  @apply bg-sepia-900/60 border border-sepia-700 text-sepia-100 px-4 py-2 rounded-md focus:ring-2 focus:ring-accent focus:border-transparent;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.cyber-button {
+  @apply relative px-4 py-2 bg-sepia-800 text-sepia-100 rounded-md overflow-hidden transition-all duration-200 border border-accent/50;
+  box-shadow: 0 0 10px rgba(224, 224, 224, 0.3);
+}
+
+.cyber-button:hover {
+  @apply bg-sepia-700;
+  box-shadow: 0 0 15px rgba(224, 224, 224, 0.5),
+              0 0 20px rgba(160, 160, 160, 0.3);
+}
+
+.cyber-button::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-full h-0.5 bg-accent opacity-70;
+}
+
+/* Custom bg-mesh utility */
+.bg-cyber-mesh {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='%23e0e0e0' fill-opacity='0.05'%3E%3Cpath d='M0 0h40v40H0V0zm20 20v20h20V20H20zm0-20v20h20V0H20z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+@layer components {
+  .container-custom {
+    @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-all duration-200;
+  }
+  
+  .btn-primary {
+    @apply cyber-button;
+  }
+  
+  .btn-outline {
+    @apply btn border border-sepia-600 text-sepia-100 hover:bg-sepia-800/50 hover:border-accent/50 hover:shadow-cyber;
+  }
+
+  .card {
+    @apply cyber-card backdrop-blur-sm bg-sepia-900/60 overflow-hidden transition-all duration-200;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-cyber;
+  }
+}
