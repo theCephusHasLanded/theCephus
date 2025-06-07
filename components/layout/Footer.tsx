@@ -22,7 +22,7 @@ export default function Footer() {
                 Privacy Policy
               </button>
               <a 
-                href="https://linkedin.com/in/christinacephus" 
+                href="https://www.linkedin.com/in/thecephus/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="hover:text-glow-primary transition-colors"

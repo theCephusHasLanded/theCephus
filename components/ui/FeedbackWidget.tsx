@@ -6,8 +6,8 @@ export default function FeedbackWidget() {
   const [isOpen, setIsOpen] = useState(false);
 
   const openLinkedInMessage = () => {
-    // LinkedIn messaging URL - replace with your actual LinkedIn profile
-    const linkedInUrl = 'https://www.linkedin.com/messaging/compose/?recipient=christinacephus';
+    // LinkedIn messaging URL - using your actual LinkedIn profile
+    const linkedInUrl = 'https://www.linkedin.com/in/thecephus/';
     window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
     setIsOpen(false);
   };

@@ -11,6 +11,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Christina Cephus | theCephus - AI Engineer & Software Developer',
   description: 'Portfolio of Christina Cephus (theCephus), showcasing AI engineering, software development, and prompt design expertise.',
+  icons: {
+    icon: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({
