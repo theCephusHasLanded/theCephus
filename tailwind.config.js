@@ -35,12 +35,12 @@ module.exports = {
         'sepia-900': '#0f0f19'
       },
       fontFamily: {
-        'display': ['Orbitron', 'Exo 2', 'monospace'],
-        'body': ['Rajdhani', 'Exo 2', 'sans-serif'],
-        'tech': ['Exo 2', 'sans-serif'],
-        'mono': ['Orbitron', 'SF Mono', 'monospace'],
-        sans: ['Rajdhani', 'Exo 2', 'sans-serif'],
-        serif: ['Orbitron', 'monospace']
+        'display': ['Victor Mono', 'monospace'],
+        'body': ['Victor Mono', 'monospace'],
+        'tech': ['Victor Mono', 'monospace'],
+        'mono': ['Victor Mono', 'monospace'],
+        sans: ['Victor Mono', 'monospace'],
+        serif: ['Victor Mono', 'monospace']
       },
       
       fontSize: {

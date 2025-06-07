@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 import DynamicBackground from '@/components/ui/DynamicBackground';
 import LoadingScreen from '@/components/ui/LoadingScreen';
 import AlienGuide from '@/components/ui/AlienGuide';
+import CookiesModal from '@/components/ui/CookiesModal';
+import FeedbackWidget from '@/components/ui/FeedbackWidget';
 
 interface LayoutClientProps {
   children: React.ReactNode;
@@ -47,7 +50,10 @@ export default function LayoutClient({ children }: LayoutClientProps) {
       <main className="flex-grow relative z-10">
         {children}
       </main>
+      <Footer />
       <AlienGuide isActive={showAlienGuide} />
+      <CookiesModal />
+      <FeedbackWidget />
     </>
   );
 }
