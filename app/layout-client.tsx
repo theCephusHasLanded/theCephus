@@ -20,11 +20,24 @@ export default function LayoutClient({ children }: LayoutClientProps) {
   const [showAlienGuide, setShowAlienGuide] = useState(false);
 
   useEffect(() => {
-    // Check if user has seen the loading screen
+    // Check if user has seen the loading screen recently
     const hasSeenLoading = localStorage.getItem('hasSeenLoading');
+    const lastSeen = localStorage.getItem('loadingLastSeen');
+    const now = Date.now();
     
-    if (hasSeenLoading) {
-      // Skip loading for returning users
+    // For development: always skip loading on localhost if URL has skip param
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.search.includes('skip=true'))) {
+      setAppState('main');
+      setShowAlienGuide(true);
+      return;
+    }
+    
+    // Show loading screen if never seen or if it's been more than 1 hour
+    if (!hasSeenLoading || !lastSeen || (now - parseInt(lastSeen)) > 3600000) {
+      // Show loading screen
+      setAppState('loading');
+    } else {
+      // Skip loading for recent visitors
       setAppState('main');
       setShowAlienGuide(true);
     }
@@ -32,6 +45,7 @@ export default function LayoutClient({ children }: LayoutClientProps) {
 
   const handleLoadingComplete = () => {
     localStorage.setItem('hasSeenLoading', 'true');
+    localStorage.setItem('loadingLastSeen', Date.now().toString());
     setAppState('main');
     setShowAlienGuide(true);
   };

@@ -20,8 +20,8 @@ export default function ContactPage() {
               </Typography>
               
               <Typography variant="body-lg" color="secondary" className="leading-relaxed mb-12 max-w-2xl mx-auto">
-                Ready to transform your ideas into intelligent, high-performance applications? 
-                I'm here to help bring your vision to life with cutting-edge AI and software engineering.
+                Got an idea for an AI project or need to build something fast and reliable? 
+                Let's talk about what you're trying to accomplish and how I can help make it happen.
               </Typography>
             </ScrollReveal>
           </div>
@@ -224,7 +224,7 @@ export default function ContactPage() {
                     
                     <Button 
                       variant="outline" 
-                      href="https://linkedin.com/in/christina-cephus" 
+                      href="https://www.linkedin.com/in/thecephus/" 
                       external
                       className="flex-1"
                     >
@@ -259,8 +259,8 @@ export default function ContactPage() {
                     Ready to Start Your Project?
                   </Typography>
                   <Typography variant="body-lg" color="secondary" className="leading-relaxed mb-8 max-w-2xl mx-auto">
-                    Whether you need AI integration, high-performance web applications, or strategic technology consulting, 
-                    I'm here to help turn your vision into reality.
+                    Whether you need AI integration, blazing-fast web applications, or just want to figure out 
+                    what technology makes sense for your project - I'm here to help make it happen.
                   </Typography>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button variant="primary" size="lg">

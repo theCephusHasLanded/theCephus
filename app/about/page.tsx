@@ -6,8 +6,10 @@ export const metadata = {
 import EditorialCard from '@/components/ui/EditorialCard';
 import Typography from '@/components/ui/Typography';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+import GitHubActivity from '@/components/ui/GitHubActivity';
 
 export default function AboutPage() {
+  const username = 'theCephusHasLanded';
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -20,9 +22,9 @@ export default function AboutPage() {
               </Typography>
               
               <Typography variant="body-lg" color="secondary" className="leading-relaxed mb-12 max-w-2xl">
-                I'm Christina Cephus, an AI engineer and software developer passionate about creating 
-                intelligent systems that transform ideas into reality. My work focuses on ultra-fast 
-                content generation, prompt engineering, and AI-powered applications that solve real-world problems.
+                Hey, I'm Christina Cephus! I build AI systems and software that actually works. 
+                I'm obsessed with making things fast - whether that's content generation, optimizing prompts, 
+                or building applications that solve problems people actually have.
               </Typography>
               
               <div className="flex flex-wrap gap-4">
@@ -42,7 +44,7 @@ export default function AboutPage() {
               <div className="glow-card p-8 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-30">
                   <img 
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop&crop=face" 
+                    src="https://github.com/theCephusHasLanded.png" 
                     alt="Christina Cephus" 
                     className="w-full h-full object-cover"
                   />
@@ -70,8 +72,8 @@ export default function AboutPage() {
                 Expertise & Capabilities
               </Typography>
               <Typography variant="body-lg" color="secondary" className="max-w-3xl mx-auto leading-relaxed">
-                Combining deep technical knowledge with creative problem-solving to deliver 
-                innovative AI solutions and high-performance applications.
+                I combine technical depth with creative problem-solving. My goal is simple: 
+                build things that work really well and make people's lives easier.
               </Typography>
             </header>
           </ScrollReveal>
@@ -88,8 +90,8 @@ export default function AboutPage() {
                   AI & Machine Learning
                 </Typography>
                 <Typography variant="body" color="secondary" className="leading-relaxed mb-6">
-                  Advanced prompt engineering, model fine-tuning, and intelligent system architecture 
-                  for next-generation applications.
+                  I craft prompts that actually work, fine-tune models to do exactly what they need to do, 
+                  and architect systems that scale without breaking.
                 </Typography>
                 <ul className="text-caption text-accent space-y-2">
                   <li>• Large Language Model Integration</li>
@@ -111,8 +113,8 @@ export default function AboutPage() {
                   High-Performance Development
                 </Typography>
                 <Typography variant="body" color="secondary" className="leading-relaxed mb-6">
-                  Ultra-fast content generation systems and optimized applications built for 
-                  speed, scalability, and reliability.
+                  I build applications that are genuinely fast. Not just "fast enough" - 
+                  actually fast. Speed and reliability aren't optional features.
                 </Typography>
                 <ul className="text-caption text-accent space-y-2">
                   <li>• React/Next.js Applications</li>
@@ -135,8 +137,8 @@ export default function AboutPage() {
                   Strategic Technology
                 </Typography>
                 <Typography variant="body" color="secondary" className="leading-relaxed mb-6">
-                  Business strategy, technology consulting, and implementation planning 
-                  for AI-driven digital transformation.
+                  I help businesses figure out what technology they actually need and how to implement it 
+                  without getting lost in buzzwords or over-engineering.
                 </Typography>
                 <ul className="text-caption text-accent space-y-2">
                   <li>• AI Strategy & Implementation</li>
@@ -175,15 +177,14 @@ export default function AboutPage() {
                       The AI Revolution
                     </Typography>
                     <Typography variant="body-lg" color="secondary" className="leading-relaxed mb-6">
-                      My fascination with artificial intelligence began with a simple question: How can we make 
-                      technology more intuitive and helpful? This led me down a path of exploring language models, 
-                      prompt engineering, and the intersection of human creativity with machine intelligence.
+                      I got into AI because I wanted to make technology that actually helps people instead of 
+                      getting in their way. Started with language models and prompt engineering, then realized 
+                      the real magic happens when you combine human creativity with machine intelligence.
                     </Typography>
                     <Typography variant="body" color="secondary" className="leading-relaxed">
-                      Today, I specialize in creating AI-powered systems that don't just automate tasks, 
-                      but actually enhance human creativity and productivity. From ultra-fast content generation 
-                      to intelligent business applications, my work focuses on practical AI implementations 
-                      that solve real problems.
+                      Now I build AI systems that enhance what people can do rather than replace them. 
+                      Whether it's generating content at lightning speed or creating business applications 
+                      that actually make sense, I focus on practical implementations that solve real problems.
                     </Typography>
                   </div>
                 </div>
@@ -203,20 +204,41 @@ export default function AboutPage() {
                       Engineering Excellence
                     </Typography>
                     <Typography variant="body-lg" color="secondary" className="leading-relaxed mb-6">
-                      Beyond AI, I'm passionate about creating exceptional software experiences. My development 
-                      philosophy centers on performance, user experience, and maintainable code that scales 
-                      with business needs.
+                      When I'm not working on AI stuff, I'm building software that people actually enjoy using. 
+                      I care about performance, user experience, and writing code that won't make future developers 
+                      want to start over from scratch.
                     </Typography>
                     <Typography variant="body" color="secondary" className="leading-relaxed">
-                      Whether it's building lightning-fast web applications, designing robust APIs, or 
-                      implementing complex business logic, I approach each project with attention to detail 
-                      and a commitment to excellence that drives tangible results.
+                      Whether I'm building web applications, designing APIs, or implementing complex business logic, 
+                      I pay attention to the details that make software feel smooth and reliable. 
+                      The goal is always to deliver something that works really well.
                     </Typography>
                   </div>
                 </div>
               </ScrollReveal>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* GitHub Activity Section */}
+      <section className="py-32">
+        <div className="container-custom">
+          <ScrollReveal>
+            <Typography variant="headline" color="primary" className="mb-12 text-center text-glow-subtle">
+              Live GitHub Activity
+            </Typography>
+            <Typography variant="body-lg" color="secondary" className="text-center max-w-3xl mx-auto mb-16 leading-relaxed">
+              Here's what I've been working on lately. This updates automatically every 5 minutes 
+              so you can see my latest projects and contributions in real-time.
+            </Typography>
+          </ScrollReveal>
+          
+          <GitHubActivity 
+            username={username} 
+            pollInterval={5 * 60 * 1000} // 5 minutes
+            className="max-w-6xl mx-auto"
+          />
         </div>
       </section>
 
@@ -241,8 +263,8 @@ export default function AboutPage() {
                   Innovation First
                 </Typography>
                 <Typography variant="body" color="secondary" className="leading-relaxed">
-                  Constantly exploring cutting-edge technologies and methodologies to deliver 
-                  solutions that push the boundaries of what's possible.
+                  I'm always exploring new technologies and approaches. The goal is to push boundaries 
+                  while building things that actually work in the real world.
                 </Typography>
               </div>
             </ScrollReveal>
@@ -258,8 +280,8 @@ export default function AboutPage() {
                   Speed & Quality
                 </Typography>
                 <Typography variant="body" color="secondary" className="leading-relaxed">
-                  Delivering high-quality solutions rapidly without compromising on reliability, 
-                  security, or user experience.
+                  I deliver high-quality work fast. Speed doesn't mean cutting corners - 
+                  it means being efficient and focused on what matters.
                 </Typography>
               </div>
             </ScrollReveal>
@@ -275,8 +297,8 @@ export default function AboutPage() {
                   Human-Centered
                 </Typography>
                 <Typography variant="body" color="secondary" className="leading-relaxed">
-                  Technology should enhance human capabilities, not replace them. Every solution 
-                  is designed with the end user's needs and experience in mind.
+                  Technology should make people more capable, not replace them. 
+                  I design everything with the actual user's needs and experience in mind.
                 </Typography>
               </div>
             </ScrollReveal>
@@ -292,8 +314,8 @@ export default function AboutPage() {
                   Scalable Solutions
                 </Typography>
                 <Typography variant="body" color="secondary" className="leading-relaxed">
-                  Building systems that grow with your business, from prototype to enterprise scale, 
-                  with maintainable and extensible architectures.
+                  I build systems that grow with your business. From prototype to enterprise scale, 
+                  the architecture should be maintainable and extensible from day one.
                 </Typography>
               </div>
             </ScrollReveal>

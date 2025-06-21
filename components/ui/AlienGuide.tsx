@@ -12,11 +12,25 @@ interface Target {
   priority: number;
 }
 
+const PROMPT_ENGINEERING_TIPS = [
+  "💡 Start with 'You are an expert...' to define the AI's role clearly!",
+  "🎯 Be specific about output format: 'Respond in bullet points' or 'Use JSON format'.",
+  "📋 Add constraints: 'Keep under 200 words' or 'Avoid technical jargon'.",
+  "🌟 Include examples: 'Like this: [example]' shows the AI what you want.",
+  "🔍 Provide context: Background information helps AI understand your situation.",
+  "⚡ Use step-by-step instructions: 'First analyze, then recommend, finally explain'.",
+  "🎭 Set the tone: 'Write in a professional tone' or 'Be casual and friendly'.",
+  "🧠 Think aloud: 'Explain your reasoning' gets better AI responses.",
+  "📊 Request structure: 'Organize in sections' or 'Use headings and subheadings'.",
+  "🚀 End with quality checks: 'Ensure accuracy and double-check facts'."
+];
+
 export default function AlienGuide({ isActive }: AlienGuideProps) {
   const [currentTarget, setCurrentTarget] = useState<Target | null>(null);
   const [position, setPosition] = useState({ x: 100, y: 100 });
   const [isVisible, setIsVisible] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
+  const [showPromptTip, setShowPromptTip] = useState(false);
   const alienRef = useRef<HTMLDivElement>(null);
   const messageTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -87,7 +101,44 @@ export default function AlienGuide({ isActive }: AlienGuideProps) {
     }, 3000);
   };
 
+  const isOnPromptEngineerPage = (): boolean => {
+    return window.location.pathname.includes('/prompt-engineer');
+  };
+
+  const showRandomPromptTip = () => {
+    const randomTip = PROMPT_ENGINEERING_TIPS[Math.floor(Math.random() * PROMPT_ENGINEERING_TIPS.length)];
+    
+    // Random floating position
+    const newX = Math.random() * (window.innerWidth - 300) + 50;
+    const newY = Math.random() * (window.innerHeight - 200) + 100;
+    setPosition({ x: newX, y: newY });
+    
+    // Set tip as current target
+    setCurrentTarget({ 
+      element: document.body, 
+      message: randomTip, 
+      priority: 10 
+    });
+    setShowPromptTip(true);
+    setShowMessage(true);
+    
+    // Hide tip after 5 seconds (longer for reading)
+    if (messageTimeoutRef.current) {
+      clearTimeout(messageTimeoutRef.current);
+    }
+    messageTimeoutRef.current = setTimeout(() => {
+      setShowMessage(false);
+      setShowPromptTip(false);
+    }, 5000);
+  };
+
   const randomFloat = () => {
+    // 30% chance to show prompt tip if on prompt engineer page
+    if (isOnPromptEngineerPage() && Math.random() < 0.3) {
+      showRandomPromptTip();
+      return;
+    }
+    
     const targets = findTargets();
     if (targets.length === 0) {
       // Random floating if no targets
@@ -96,6 +147,7 @@ export default function AlienGuide({ isActive }: AlienGuideProps) {
       setPosition({ x: newX, y: newY });
       setCurrentTarget(null);
       setShowMessage(false);
+      setShowPromptTip(false);
       return;
     }
     
@@ -104,6 +156,7 @@ export default function AlienGuide({ isActive }: AlienGuideProps) {
     const targetList = highPriorityTargets.length > 0 ? highPriorityTargets : targets;
     const randomTarget = targetList[Math.floor(Math.random() * targetList.length)];
     
+    setShowPromptTip(false);
     moveToTarget(randomTarget);
   };
 
@@ -184,7 +237,8 @@ export default function AlienGuide({ isActive }: AlienGuideProps) {
             transform: `translate(${position.x - 50}px, ${position.y - 40}px)`,
           }}
         >
-          <div className="message-bubble">
+          <div className={`message-bubble ${showPromptTip ? 'prompt-tip' : ''}`}>
+            {showPromptTip && <div className="tip-header">💡 Prompt Tip:</div>}
             {currentTarget.message}
             <div className="message-arrow"></div>
           </div>
@@ -274,6 +328,29 @@ export default function AlienGuide({ isActive }: AlienGuideProps) {
           animation: messagePulse 2s ease-in-out infinite;
         }
 
+        .message-bubble.prompt-tip {
+          background: linear-gradient(135deg, 
+            rgba(255, 215, 0, 0.95) 0%, 
+            rgba(255, 140, 0, 0.95) 100%);
+          border: 1px solid rgba(255, 215, 0, 0.8);
+          color: rgba(0, 0, 0, 0.9);
+          font-weight: 600;
+          white-space: normal;
+          max-width: 280px;
+          padding: 12px 16px;
+          box-shadow: 
+            0 4px 20px rgba(0, 0, 0, 0.5),
+            0 0 20px rgba(255, 215, 0, 0.4);
+          animation: promptTipPulse 3s ease-in-out infinite;
+        }
+
+        .tip-header {
+          font-weight: bold;
+          margin-bottom: 4px;
+          color: rgba(0, 0, 0, 0.8);
+          font-size: 0.75rem;
+        }
+
         .message-arrow {
           position: absolute;
           bottom: -6px;
@@ -334,6 +411,21 @@ export default function AlienGuide({ isActive }: AlienGuideProps) {
             box-shadow: 
               0 4px 25px rgba(0, 0, 0, 0.6),
               0 0 30px rgba(0, 200, 255, 0.5);
+          }
+        }
+
+        @keyframes promptTipPulse {
+          0%, 100% { 
+            box-shadow: 
+              0 4px 20px rgba(0, 0, 0, 0.5),
+              0 0 20px rgba(255, 215, 0, 0.4);
+            transform: scale(1);
+          }
+          50% { 
+            box-shadow: 
+              0 4px 25px rgba(0, 0, 0, 0.6),
+              0 0 30px rgba(255, 215, 0, 0.6);
+            transform: scale(1.02);
           }
         }
 

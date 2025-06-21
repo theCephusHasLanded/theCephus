@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import PopupForm from '@/components/ui/PopupForm';
+import ConstellationBackground from '@/components/ui/ConstellationBackground';
 
 export default function Home() {
   const [showPopup, setShowPopup] = useState(false);
@@ -26,8 +27,9 @@ export default function Home() {
   };
   return (
     <div className="min-h-screen">
+      <ConstellationBackground />
       {/* Hero Section - Asymmetric Layout */}
-      <section className="py-32 md:py-40">
+      <section className="py-32 md:py-40 relative">
         <div className="container-custom">
           <div className="asymmetric-grid items-center">
             <div className="fade-in-up">

@@ -9,6 +9,7 @@ interface LoadingScreenProps {
 export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const [progress, setProgress] = useState(0);
   const [currentPhase, setCurrentPhase] = useState(0);
+  const [particles, setParticles] = useState<Array<{left: number, top: number, delay: number, duration: number}>>([]);
   
   const phases = [
     'INITIALIZING QUANTUM CORE',
@@ -18,10 +19,22 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
     'ESTABLISHING CONNECTION'
   ];
 
+  // Generate particles only on client side to avoid hydration mismatch
+  useEffect(() => {
+    const particleData = [...Array(20)].map((_, i) => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      delay: Math.random() * 3,
+      duration: 3 + Math.random() * 2
+    }));
+    setParticles(particleData);
+  }, []);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress(prev => {
-        const newProgress = prev + Math.random() * 3 + 1;
+        const increment = Math.random() * 3 + 1;
+        const newProgress = prev + increment;
         
         // Update phase based on progress
         const phaseIndex = Math.floor((newProgress / 100) * phases.length);
@@ -40,20 +53,24 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
   }, [onComplete, phases.length]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-loading">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-loading cursor-pointer"
+      onClick={onComplete}
+      title="Click to skip loading"
+    >
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary via-secondary to-accent">
         {/* Floating Particles */}
         <div className="particles-container">
-          {[...Array(20)].map((_, i) => (
+          {particles.map((particle, i) => (
             <div
               key={i}
               className="particle"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${3 + Math.random() * 2}s`
+                left: `${particle.left}%`,
+                top: `${particle.top}%`,
+                animationDelay: `${particle.delay}s`,
+                animationDuration: `${particle.duration}s`
               }}
             />
           ))}
@@ -106,6 +123,9 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
           </div>
           <div className="text-caption text-tech-cyan mt-4 font-mono">
             {Math.floor(progress)}% COMPLETE
+          </div>
+          <div className="text-xs text-tech-cyan/60 mt-2 font-mono animate-pulse">
+            Click anywhere to skip
           </div>
         </div>
       </div>

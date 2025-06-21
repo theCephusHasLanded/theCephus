@@ -23,6 +23,25 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            // Prevent browser extension custom element conflicts
+            (function() {
+              const originalDefine = window.customElements?.define;
+              if (originalDefine) {
+                window.customElements.define = function(name, constructor, options) {
+                  if (this.get(name)) {
+                    console.warn('Custom element already defined:', name);
+                    return;
+                  }
+                  return originalDefine.call(this, name, constructor, options);
+                };
+              }
+            })();
+          `
+        }} />
+      </head>
       <body className={`${inter.variable} font-sans min-h-screen flex flex-col text-sepia-100`}>
         <LayoutClient>{children}</LayoutClient>
       </body>

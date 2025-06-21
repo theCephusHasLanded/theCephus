@@ -29,6 +29,10 @@ export default function Header() {
               Prompts
               <span className="absolute bottom-0 left-0 w-0 h-px bg-glow-primary transition-all duration-200 group-hover:w-full shadow-glow"></span>
             </Link>
+            <Link href="/prompt-engineer" className="font-tech font-medium text-secondary hover:text-glow-secondary transition-colors duration-200 relative group uppercase tracking-wide">
+              AI Engineer
+              <span className="absolute bottom-0 left-0 w-0 h-px bg-glow-secondary transition-all duration-200 group-hover:w-full shadow-glow"></span>
+            </Link>
             <Link href="/about" className="font-tech font-medium text-secondary hover:text-glow-primary transition-colors duration-200 relative group uppercase tracking-wide">
               About
               <span className="absolute bottom-0 left-0 w-0 h-px bg-glow-primary transition-all duration-200 group-hover:w-full shadow-glow"></span>

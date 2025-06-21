@@ -14,16 +14,112 @@ export interface GitHubCommit {
   };
 }
 
-// Fetch top 3 most recently updated repositories for a user
-export async function fetchTopRepositories(username: string, count: number = 3): Promise<any[]> {
+export interface GitHubUser {
+  login: string;
+  avatar_url: string;
+  name: string;
+  bio: string;
+  public_repos: number;
+  followers: number;
+  following: number;
+  html_url: string;
+  company?: string;
+  location?: string;
+  created_at: string;
+}
+
+export interface GitHubRepo {
+  id: number;
+  name: string;
+  full_name: string;
+  html_url: string;
+  description: string;
+  stargazers_count: number;
+  forks_count: number;
+  language: string;
+  updated_at: string;
+  pushed_at: string;
+}
+
+export interface GitHubEvent {
+  id: string;
+  type: string;
+  actor: {
+    login: string;
+    avatar_url: string;
+  };
+  repo: {
+    name: string;
+    url: string;
+  };
+  payload: any;
+  public: boolean;
+  created_at: string;
+}
+
+export interface GitHubActivityData {
+  user: GitHubUser | null;
+  repos: GitHubRepo[];
+  events: GitHubEvent[];
+  lastUpdated: string;
+  error?: string;
+}
+
+// Helper function to get GitHub API headers with optional auth
+function getGitHubHeaders(): HeadersInit {
+  const headers: HeadersInit = {
+    'Accept': 'application/vnd.github.v3+json',
+    'User-Agent': 'Portfolio-App'
+  };
+  
+  // Add auth token if available (for higher rate limits)
+  if (typeof window !== 'undefined') {
+    // Client-side: get from environment or local storage
+    const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
+    if (token) {
+      headers['Authorization'] = `token ${token}`;
+    }
+  } else {
+    // Server-side: get from environment
+    const token = process.env.GITHUB_TOKEN;
+    if (token) {
+      headers['Authorization'] = `token ${token}`;
+    }
+  }
+  
+  return headers;
+}
+
+// Fetch GitHub user profile data (no caching)
+export async function fetchGitHubUser(username: string): Promise<GitHubUser | null> {
   try {
     const response = await fetch(
-      `https://api.github.com/users/${username}/repos?sort=updated&per_page=${count}`,
+      `https://api.github.com/users/${username}`,
       {
-        headers: {
-          'Accept': 'application/vnd.github.v3+json',
-        },
-        next: { revalidate: 3600 } // Cache for 1 hour
+        headers: getGitHubHeaders(),
+        cache: 'no-store'
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`GitHub API error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching GitHub user:', error);
+    return null;
+  }
+}
+
+// Fetch top repositories for a user (no caching)
+export async function fetchTopRepositories(username: string, count: number = 6): Promise<GitHubRepo[]> {
+  try {
+    const response = await fetch(
+      `https://api.github.com/users/${username}/repos?sort=updated&per_page=${count}&type=owner`,
+      {
+        headers: getGitHubHeaders(),
+        cache: 'no-store'
       }
     );
 
@@ -38,16 +134,36 @@ export async function fetchTopRepositories(username: string, count: number = 3):
   }
 }
 
-// Fetch recent commits from a specific repository
+// Fetch recent public events for a user (no caching)
+export async function fetchGitHubEvents(username: string, count: number = 10): Promise<GitHubEvent[]> {
+  try {
+    const response = await fetch(
+      `https://api.github.com/users/${username}/events/public?per_page=${count}`,
+      {
+        headers: getGitHubHeaders(),
+        cache: 'no-store'
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`GitHub API error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching GitHub events:', error);
+    return [];
+  }
+}
+
+// Fetch recent commits from a specific repository (no caching)
 export async function fetchRepoCommits(username: string, repo: string, count: number = 5): Promise<GitHubCommit[]> {
   try {
     const response = await fetch(
       `https://api.github.com/repos/${username}/${repo}/commits?per_page=${count}`,
       {
-        headers: {
-          'Accept': 'application/vnd.github.v3+json',
-        },
-        next: { revalidate: 3600 } // Cache for 1 hour
+        headers: getGitHubHeaders(),
+        cache: 'no-store'
       }
     );
 
@@ -71,7 +187,34 @@ export async function fetchRepoCommits(username: string, repo: string, count: nu
   }
 }
 
-// Fetch recent commits across all repositories
+// Fetch all GitHub activity data for a user
+export async function fetchGitHubActivity(username: string): Promise<GitHubActivityData> {
+  try {
+    const [user, repos, events] = await Promise.all([
+      fetchGitHubUser(username),
+      fetchTopRepositories(username, 6),
+      fetchGitHubEvents(username, 15)
+    ]);
+
+    return {
+      user,
+      repos,
+      events,
+      lastUpdated: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('Error fetching GitHub activity:', error);
+    return {
+      user: null,
+      repos: [],
+      events: [],
+      lastUpdated: new Date().toISOString(),
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+}
+
+// Fetch recent commits across all repositories (legacy function)
 export async function fetchAllRecentCommits(username: string, count: number = 10): Promise<GitHubCommit[]> {
   try {
     // First, get the top repositories
@@ -274,4 +417,60 @@ export function formatDate(dateString: string): string {
 export function truncateMessage(message: string, maxLength: number = 80): string {
   if (message.length <= maxLength) return message;
   return message.substring(0, maxLength) + '...';
+}
+
+// Get event type icon and description
+export function getEventInfo(eventType: string): { icon: string; description: string; color: string } {
+  switch (eventType) {
+    case 'PushEvent':
+      return { icon: '📝', description: 'Pushed commits', color: 'text-glow-primary' };
+    case 'CreateEvent':
+      return { icon: '🎉', description: 'Created repository', color: 'text-glow-secondary' };
+    case 'WatchEvent':
+      return { icon: '⭐', description: 'Starred repository', color: 'text-yellow-400' };
+    case 'ForkEvent':
+      return { icon: '🍴', description: 'Forked repository', color: 'text-glow-primary' };
+    case 'IssuesEvent':
+      return { icon: '🐛', description: 'Opened issue', color: 'text-red-400' };
+    case 'PullRequestEvent':
+      return { icon: '🔀', description: 'Pull request', color: 'text-glow-secondary' };
+    case 'ReleaseEvent':
+      return { icon: '🚀', description: 'Released version', color: 'text-green-400' };
+    case 'PublicEvent':
+      return { icon: '🌐', description: 'Made repository public', color: 'text-blue-400' };
+    default:
+      return { icon: '📊', description: 'Activity', color: 'text-accent' };
+  }
+}
+
+// Format relative time
+export function formatRelativeTime(dateString: string): string {
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  
+  if (diffInSeconds < 60) {
+    return 'just now';
+  } else if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60);
+    return `${minutes}m ago`;
+  } else if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600);
+    return `${hours}h ago`;
+  } else if (diffInSeconds < 604800) {
+    const days = Math.floor(diffInSeconds / 86400);
+    return `${days}d ago`;
+  } else {
+    return formatDate(dateString);
+  }
+}
+
+// Format numbers with K/M suffixes
+export function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M';
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'K';
+  }
+  return num.toString();
 }
