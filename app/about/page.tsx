@@ -10,6 +10,17 @@ import GitHubActivity from '@/components/ui/GitHubActivity';
 
 export default function AboutPage() {
   const username = 'theCephusHasLanded';
+  
+  // Example Loom videos - you can add your actual video IDs here
+  const loomVideos = [
+    // {
+    //   repoName: 'your-repo-name',
+    //   videoId: 'your-loom-video-id',
+    //   title: 'Project Walkthrough',
+    //   description: 'Full demo and code explanation'
+    // }
+  ];
+  
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -238,6 +249,7 @@ export default function AboutPage() {
             username={username} 
             pollInterval={5 * 60 * 1000} // 5 minutes
             className="max-w-6xl mx-auto"
+            loomVideos={loomVideos}
           />
         </div>
       </section>

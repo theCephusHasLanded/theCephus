@@ -34,7 +34,15 @@ export default function FeedbackWidget() {
 
       {/* The Mothership Modal System */}
       {state !== 'closed' && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
+          onClick={(e) => {
+            // Close modal when clicking backdrop
+            if (e.target === e.currentTarget) {
+              setState('closed');
+            }
+          }}
+        >
           {/* Intro Modal */}
           {state === 'intro' && (
             <ScrollReveal>
@@ -53,7 +61,8 @@ export default function FeedbackWidget() {
                   </div>
                   <button
                     onClick={() => setState('closed')}
-                    className="text-glow-secondary hover:text-glow-primary transition-colors p-2 hover:bg-glow-primary/10 rounded-lg"
+                    className="text-glow-secondary hover:text-glow-primary transition-colors p-3 hover:bg-glow-primary/10 rounded-lg touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    aria-label="Close modal"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

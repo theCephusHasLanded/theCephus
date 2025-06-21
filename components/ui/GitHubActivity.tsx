@@ -12,16 +12,25 @@ import {
 import Typography from '@/components/ui/Typography';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 
+interface LoomVideo {
+  repoName: string;
+  videoId: string;
+  title: string;
+  description?: string;
+}
+
 interface GitHubActivityProps {
   username: string;
   pollInterval?: number; // in milliseconds, default 5 minutes
   className?: string;
+  loomVideos?: LoomVideo[]; // Optional Loom videos for projects
 }
 
 export default function GitHubActivity({ 
   username, 
   pollInterval = 5 * 60 * 1000, // 5 minutes
-  className = ''
+  className = '',
+  loomVideos = []
 }: GitHubActivityProps) {
   const [data, setData] = useState<GitHubActivityData>({
     user: null,
@@ -266,52 +275,104 @@ export default function GitHubActivity({
             </Typography>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {repos.slice(0, 6).map((repo) => (
-                <a
-                  key={repo.id}
-                  href={repo.html_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-4 bg-glow-secondary/5 rounded-lg border border-glow-secondary/10 hover:border-glow-secondary/30 transition-all duration-300 group"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <Typography variant="body" color="primary" className="font-medium group-hover:text-glow-secondary transition-colors">
-                      {repo.name}
-                    </Typography>
-                    <div className="flex items-center space-x-3 text-sm">
-                      {repo.stargazers_count > 0 && (
-                        <span className="flex items-center space-x-1 text-yellow-400">
-                          <span>⭐</span>
-                          <span>{formatNumber(repo.stargazers_count)}</span>
+              {repos.slice(0, 6).map((repo) => {
+                const loomVideo = loomVideos.find(video => video.repoName === repo.name);
+                
+                return (
+                  <div
+                    key={repo.id}
+                    className="p-4 bg-glow-secondary/5 rounded-lg border border-glow-secondary/10 hover:border-glow-secondary/30 transition-all duration-300 group"
+                  >
+                    {/* Repository Header */}
+                    <div className="flex items-start justify-between mb-2">
+                      <a
+                        href={repo.html_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        <Typography variant="body" color="primary" className="font-medium group-hover:text-glow-secondary transition-colors">
+                          {repo.name}
+                        </Typography>
+                      </a>
+                      <div className="flex items-center space-x-3 text-sm">
+                        {repo.stargazers_count > 0 && (
+                          <span className="flex items-center space-x-1 text-yellow-400">
+                            <span>⭐</span>
+                            <span>{formatNumber(repo.stargazers_count)}</span>
+                          </span>
+                        )}
+                        {repo.forks_count > 0 && (
+                          <span className="flex items-center space-x-1 text-glow-primary">
+                            <span>🍴</span>
+                            <span>{formatNumber(repo.forks_count)}</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Repository Description */}
+                    {repo.description && (
+                      <Typography variant="caption" color="secondary" className="mb-3 opacity-80">
+                        {truncateMessage(repo.description, 80)}
+                      </Typography>
+                    )}
+                    
+                    {/* Loom Video Section */}
+                    {loomVideo ? (
+                      <div className="mb-4 p-3 bg-glow-primary/10 border border-glow-primary/20 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <Typography variant="caption" className="font-semibold text-glow-primary">
+                            🎥 Project Demo
+                          </Typography>
+                          <a
+                            href={`https://www.loom.com/share/${loomVideo.videoId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-glow-secondary hover:text-glow-primary transition-colors"
+                          >
+                            Watch Video →
+                          </a>
+                        </div>
+                        <Typography variant="caption" color="secondary" className="text-xs">
+                          {loomVideo.title}
+                        </Typography>
+                        {loomVideo.description && (
+                          <Typography variant="caption" color="secondary" className="text-xs opacity-70 mt-1 block">
+                            {loomVideo.description}
+                          </Typography>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="mb-4 p-3 bg-glow-secondary/10 border border-glow-secondary/20 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <Typography variant="caption" className="font-semibold text-glow-secondary">
+                            🎬 Demo Coming Soon
+                          </Typography>
+                          <Typography variant="caption" color="secondary" className="text-xs opacity-60">
+                            Video in progress
+                          </Typography>
+                        </div>
+                        <Typography variant="caption" color="secondary" className="text-xs opacity-70 mt-1">
+                          Project walkthrough video will be added here
+                        </Typography>
+                      </div>
+                    )}
+                    
+                    {/* Repository Footer */}
+                    <div className="flex items-center justify-between">
+                      {repo.language && (
+                        <span className="px-2 py-1 bg-glow-primary/20 rounded text-xs text-glow-primary">
+                          {repo.language}
                         </span>
                       )}
-                      {repo.forks_count > 0 && (
-                        <span className="flex items-center space-x-1 text-glow-primary">
-                          <span>🍴</span>
-                          <span>{formatNumber(repo.forks_count)}</span>
-                        </span>
-                      )}
+                      <Typography variant="caption" color="secondary" className="opacity-60">
+                        Updated {formatRelativeTime(repo.updated_at)}
+                      </Typography>
                     </div>
                   </div>
-                  
-                  {repo.description && (
-                    <Typography variant="caption" color="secondary" className="mb-3 opacity-80">
-                      {truncateMessage(repo.description, 80)}
-                    </Typography>
-                  )}
-                  
-                  <div className="flex items-center justify-between">
-                    {repo.language && (
-                      <span className="px-2 py-1 bg-glow-primary/20 rounded text-xs text-glow-primary">
-                        {repo.language}
-                      </span>
-                    )}
-                    <Typography variant="caption" color="secondary" className="opacity-60">
-                      Updated {formatRelativeTime(repo.updated_at)}
-                    </Typography>
-                  </div>
-                </a>
-              ))}
+                );
+              })}
             </div>
           </div>
         </ScrollReveal>

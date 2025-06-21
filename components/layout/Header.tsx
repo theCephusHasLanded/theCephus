@@ -1,6 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function Header() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-primary/80 border-b border-subtle">
       <div className="container-custom py-6">
@@ -56,14 +61,94 @@ export default function Header() {
           </nav>
 
           {/* Mobile menu button */}
-          <button className="md:hidden p-2 text-secondary hover:text-glow-primary transition-colors duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 text-secondary hover:text-glow-primary transition-colors duration-200 z-50 relative"
+            aria-label="Toggle mobile menu"
+          >
+            {isMobileMenuOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            )}
           </button>
         </div>
+        
+        {/* Mobile Navigation Modal */}
+        {isMobileMenuOpen && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-40 md:hidden">
+            <div className="flex flex-col items-center justify-center min-h-screen space-y-8 px-6">
+              <Link 
+                href="/" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-2xl font-tech font-medium text-secondary hover:text-glow-primary transition-colors duration-200 uppercase tracking-wide"
+              >
+                Home
+              </Link>
+              <Link 
+                href="/projects" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-2xl font-tech font-medium text-secondary hover:text-glow-primary transition-colors duration-200 uppercase tracking-wide"
+              >
+                Projects
+              </Link>
+              <Link 
+                href="/github-activity" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-2xl font-tech font-medium text-secondary hover:text-glow-primary transition-colors duration-200 uppercase tracking-wide"
+              >
+                Activity
+              </Link>
+              <Link 
+                href="/prompts" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-2xl font-tech font-medium text-secondary hover:text-glow-primary transition-colors duration-200 uppercase tracking-wide"
+              >
+                Prompts
+              </Link>
+              <Link 
+                href="/prompt-engineer" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-2xl font-tech font-medium text-secondary hover:text-glow-secondary transition-colors duration-200 uppercase tracking-wide"
+              >
+                AI Engineer
+              </Link>
+              <Link 
+                href="/about" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-2xl font-tech font-medium text-secondary hover:text-glow-primary transition-colors duration-200 uppercase tracking-wide"
+              >
+                About
+              </Link>
+              <Link 
+                href="/contact" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-2xl font-tech font-medium text-secondary hover:text-glow-primary transition-colors duration-200 uppercase tracking-wide"
+              >
+                Contact
+              </Link>
+              <a 
+                href="https://github.com/theCephusHasLanded" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-2xl font-tech font-medium text-secondary hover:text-glow-primary transition-colors duration-200 flex items-center uppercase tracking-wide"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                </svg>
+                GitHub
+              </a>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
