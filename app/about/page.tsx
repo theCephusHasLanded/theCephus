@@ -12,7 +12,12 @@ export default function AboutPage() {
   const username = 'theCephusHasLanded';
   
   // Example Loom videos - you can add your actual video IDs here
-  const loomVideos = [
+  const loomVideos: Array<{
+    repoName: string;
+    videoId: string;
+    title: string;
+    description?: string;
+  }> = [
     // {
     //   repoName: 'your-repo-name',
     //   videoId: 'your-loom-video-id',
