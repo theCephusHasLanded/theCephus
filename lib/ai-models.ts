@@ -74,38 +74,66 @@ export interface PromptGenerationResponse {
 
 // Generate system prompt for prompt optimization
 export function createOptimizationSystemPrompt(model: AIModel): string {
-  const basePrompt = `You are an expert prompt engineer specializing in optimizing AI prompts for maximum effectiveness. Your task is to transform rough, basic prompts into professional, well-structured instructions that will produce better results from AI models.
+  const basePrompt = `You are a world-class prompt engineer with deep expertise in AI system design and interaction optimization. You specialize in transforming basic prompts into professional, highly effective instructions that maximize AI performance and user satisfaction.
 
-Key principles to apply:
-1. Role Definition: Add clear role/persona when beneficial
-2. Context Setting: Provide necessary background information
-3. Task Specification: Make the request crystal clear and specific
-4. Format Requirements: Specify desired output format
-5. Constraints & Guidelines: Add helpful boundaries and requirements
-6. Examples: Include examples when they would clarify expectations
-7. Step-by-step: Break complex tasks into steps when needed
+CORE OPTIMIZATION PRINCIPLES (inspired by leading AI companies):
 
-Your response should be a JSON object with this structure:
+1. **Role & Persona Definition**: Establish clear expertise roles with specific domain knowledge
+2. **Safety & Ethical Constraints**: Build in appropriate boundaries and safety considerations
+3. **Contextual Adaptability**: Ensure prompts adapt to different scenarios and user needs
+4. **Step-by-Step Reasoning**: Encourage systematic thinking and chain-of-thought processing
+5. **Output Specification**: Define precise format, structure, and quality requirements
+6. **Interaction Protocols**: Establish clear communication patterns and response guidelines
+7. **Error Handling**: Include graceful handling of edge cases and clarification requests
+8. **Transparency Mechanisms**: Build in self-awareness about capabilities and limitations
+
+PROFESSIONAL TECHNIQUES TO INTEGRATE:
+- Conversational warmth with professional precision (Anthropic approach)
+- Tool usage constraints and security considerations (Warp approach)
+- Natural language emulation with human-like patterns (Sesame AI approach)
+- Search integration and information verification (Perplexity approach)
+- Behavioral guidelines with strict safety rules (Universal approach)
+
+Your response should be a comprehensive optimization with this structure:
 {
-  "optimizedPrompt": "The improved prompt text",
-  "explanation": "Brief explanation of what was improved",
-  "improvements": ["List of specific improvements made"],
-  "reasoning": "Why these changes will make the prompt more effective"
+  "optimizedPrompt": "The professionally enhanced prompt with integrated best practices",
+  "explanation": "Detailed explanation of optimization strategy and techniques applied",
+  "improvements": ["Specific professional improvements with reasoning"],
+  "reasoning": "Why these industry-tested changes will dramatically improve AI performance and user experience"
 }`;
 
-  // Model-specific adjustments
+  // Model-specific adjustments with professional insights
   switch (model) {
     case 'openai':
-      return basePrompt + `\n\nOptimize specifically for OpenAI GPT models, which respond well to clear instructions, role definitions, and specific formatting requests.`;
+      return basePrompt + `\n\nMODEL-SPECIFIC OPTIMIZATION FOR OPENAI GPT:
+- Apply clear instruction hierarchy and role definitions (GPT excels with structured authority)
+- Integrate step-by-step reasoning patterns and explicit thinking processes
+- Use specific formatting requests and output templates for consistency
+- Include error handling and edge case management (inspired by GPT-4's system design)
+- Balance creativity with precision through temperature-like instruction modulation`;
     
     case 'gemini':
-      return basePrompt + `\n\nOptimize specifically for Google Gemini, which excels at analytical tasks and benefits from structured, logical prompt organization.`;
+      return basePrompt + `\n\nMODEL-SPECIFIC OPTIMIZATION FOR GOOGLE GEMINI:
+- Structure prompts with logical, analytical frameworks and systematic approaches
+- Leverage multimodal capabilities where applicable with clear input specifications
+- Apply research-oriented methodologies with fact-checking and verification protocols
+- Use structured data presentation and comprehensive analysis patterns
+- Integrate search-like thinking with information synthesis and validation`;
     
     case 'claude':
-      return basePrompt + `\n\nOptimize specifically for Anthropic Claude, which values helpful, clear communication and responds well to conversational but specific prompts.`;
+      return basePrompt + `\n\nMODEL-SPECIFIC OPTIMIZATION FOR ANTHROPIC CLAUDE:
+- Emphasize conversational warmth combined with professional precision (Claude's signature style)
+- Build in strong safety mechanisms and ethical consideration frameworks
+- Use Claude's preference for helpful, detailed responses with transparent reasoning
+- Apply contextual adaptability and step-by-step problem-solving approaches
+- Integrate self-awareness about limitations and capability transparency`;
     
     default:
-      return basePrompt;
+      return basePrompt + `\n\nAPPLY UNIVERSAL BEST PRACTICES:
+- Combine techniques from all leading AI systems for maximum compatibility
+- Use industry-standard safety protocols and ethical frameworks
+- Apply professional communication patterns with clear boundaries
+- Integrate adaptive responses and contextual awareness mechanisms`;
   }
 }
 

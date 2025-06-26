@@ -1,8 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { AIModel, AI_MODELS } from '@/lib/ai-models';
 import Typography from '@/components/ui/Typography';
+import Button from '@/components/ui/Button';
+import APIKeyManager from '@/components/APIKeyManager';
+import { clientAIService, type AIServiceConfig } from '@/lib/client-ai-service';
 
 interface PromptFormData {
   // Core Elements
@@ -141,6 +144,8 @@ export default function PromptEngineerForm() {
   const [optimizedPrompt, setOptimizedPrompt] = useState<string>('');
   const [showAdaptiveQuestions, setShowAdaptiveQuestions] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [apiKeys, setApiKeys] = useState<AIServiceConfig>({});
+  const [showAPIConfig, setShowAPIConfig] = useState(false);
 
   const handleInputChange = (field: keyof PromptFormData, value: any) => {
     setFormData(prev => ({
@@ -248,79 +253,66 @@ export default function PromptEngineerForm() {
     return prompt.trim() || fullResult;
   };
 
+  const handleKeysUpdated = useCallback((keys: AIServiceConfig) => {
+    setApiKeys(keys);
+    clientAIService.setConfig(keys);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.originalPrompt.trim()) return;
+
+    // Check if model requires API key
+    if (formData.model !== 'local') {
+      const keyMapping: Record<string, keyof AIServiceConfig> = {
+        'claude': 'anthropicKey',
+        'openai': 'openaiKey',
+        'gemini': 'geminiKey'
+      };
+      
+      const requiredKey = keyMapping[formData.model];
+      if (requiredKey && !apiKeys[requiredKey]) {
+        setResult(`Error: ${formData.model.toUpperCase()} API key required. Please configure your API keys above.`);
+        setShowAPIConfig(true);
+        return;
+      }
+    }
 
     setIsGenerating(true);
     setResult('');
     setOptimizedPrompt('');
 
     try {
-      const response = await fetch('/api/prompt-optimization-stream', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          originalPrompt: formData.originalPrompt,
-          userResponses: {
-            role_definition: formData.roleDefinition,
-            output_format: formData.outputFormat,
-            tone_style: formData.toneStyle,
-            constraints: formData.constraints,
-            context: formData.context,
-            target_audience: formData.targetAudience,
-            domain: formData.domain,
-            length_requirement: formData.lengthRequirement,
-            technical_level: formData.technicalLevel,
-            examples: formData.examples,
-            response_structure: formData.responseStructure.join(', '),
-            quality_criteria: formData.qualityCriteria.join(', ')
-          },
-          category: formData.category,
-          model: formData.model,
-          analysis: {
-            category: formData.category,
-            complexity: 'advanced',
-            missingElements: [],
-            strengths: []
-          }
-        })
-      });
+      const request = {
+        originalPrompt: formData.originalPrompt,
+        userResponses: {
+          role_definition: formData.roleDefinition,
+          output_format: formData.outputFormat,
+          tone_style: formData.toneStyle,
+          constraints: formData.constraints,
+          context: formData.context,
+          target_audience: formData.targetAudience,
+          domain: formData.domain,
+          length_requirement: formData.lengthRequirement,
+          technical_level: formData.technicalLevel,
+          examples: formData.examples,
+          response_structure: formData.responseStructure.join(', '),
+          quality_criteria: formData.qualityCriteria.join(', ')
+        },
+        category: formData.category,
+        model: formData.model
+      };
 
-      if (!response.ok) throw new Error('Generation failed');
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
       let fullResult = '';
 
-      while (true) {
-        const { done, value } = await reader!.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') continue;
-            
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.content) {
-                fullResult += parsed.content;
-                setResult(fullResult);
-                
-                // Continuously extract and update the optimized prompt
-                const extracted = extractOptimizedPrompt(fullResult);
-                if (extracted && extracted !== fullResult) {
-                  setOptimizedPrompt(extracted);
-                }
-              }
-            } catch (e) {
-              // Skip invalid JSON
-            }
-          }
+      for await (const chunk of clientAIService.optimizePromptStream(request)) {
+        fullResult += chunk;
+        setResult(fullResult);
+        
+        // Continuously extract and update the optimized prompt
+        const extracted = extractOptimizedPrompt(fullResult);
+        if (extracted && extracted !== fullResult) {
+          setOptimizedPrompt(extracted);
         }
       }
       
@@ -329,7 +321,8 @@ export default function PromptEngineerForm() {
       setOptimizedPrompt(finalOptimized);
       
     } catch (error) {
-      setResult('Error generating optimized prompt. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setResult(`Error: ${errorMessage}`);
     } finally {
       setIsGenerating(false);
     }
@@ -347,6 +340,26 @@ export default function PromptEngineerForm() {
             <Typography variant="body" color="secondary">
               Professional prompt optimization with comprehensive controls
             </Typography>
+          </div>
+
+          {/* API Key Configuration */}
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <Typography variant="subhead">API Configuration</Typography>
+              <Button
+                variant="minimal"
+                size="sm"
+                onClick={() => setShowAPIConfig(!showAPIConfig)}
+              >
+                {showAPIConfig ? '🔼 Hide' : '🔽 Show'} API Keys
+              </Button>
+            </div>
+            {showAPIConfig && (
+              <APIKeyManager 
+                onKeysUpdated={handleKeysUpdated}
+                className="mb-6"
+              />
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">

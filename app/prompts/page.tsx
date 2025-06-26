@@ -7,6 +7,7 @@ import EditorialCard from '@/components/ui/EditorialCard';
 import Typography from '@/components/ui/Typography';
 import Button from '@/components/ui/Button';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+import SystemPromptsTable from '@/components/SystemPromptsTable';
 
 export default function PromptsPage() {
   return (
@@ -109,8 +110,17 @@ export default function PromptsPage() {
         </div>
       </section>
 
-      {/* Usage Guidelines */}
+      {/* Professional System Prompts Collection */}
       <section className="py-32">
+        <div className="container-custom">
+          <ScrollReveal>
+            <SystemPromptsTable />
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* Usage Guidelines */}
+      <section className="py-32 bg-secondary">
         <div className="container-custom">
           <ScrollReveal>
             <div className="max-w-4xl mx-auto">

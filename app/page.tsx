@@ -1,30 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import PopupForm from '@/components/ui/PopupForm';
 import ConstellationBackground from '@/components/ui/ConstellationBackground';
 
 export default function Home() {
-  const [showPopup, setShowPopup] = useState(false);
-
-  useEffect(() => {
-    // Check if user has already seen the popup
-    const hasSeenPopup = localStorage.getItem('hasSeenAIAgentPopup');
-    
-    if (!hasSeenPopup) {
-      // Show popup after 10 seconds
-      const timer = setTimeout(() => {
-        setShowPopup(true);
-      }, 10000);
-
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  const handleClosePopup = () => {
-    setShowPopup(false);
-    localStorage.setItem('hasSeenAIAgentPopup', 'true');
-  };
   return (
     <div className="min-h-screen">
       <ConstellationBackground />
@@ -273,8 +251,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AI Newsletter Agent Popup */}
-      <PopupForm isVisible={showPopup} onClose={handleClosePopup} />
     </div>
   );
 }

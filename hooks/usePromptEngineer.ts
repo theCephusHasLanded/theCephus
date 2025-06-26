@@ -11,6 +11,7 @@ import {
   exportPrompt
 } from '@/lib/prompt-analysis';
 import { ChatMessage, ChatResponse, StreamChunk } from '@/lib/ai-providers';
+import { clientAIService } from '@/lib/client-ai-service';
 
 export interface UsePromptEngineerState {
   // Conversation state
@@ -224,101 +225,71 @@ ${analysis.issues.length > 0 ? analysis.issues.map(i => `• ${i.message}`).join
 
       addMessage('assistant', `🚀 Optimizing your prompt using ${model}...`);
 
-      // Prepare the optimization request
-      const messages: ChatMessage[] = [
-        {
-          role: 'system',
-          content: `You are an expert prompt engineer. Optimize the user's prompt based on the analysis and their responses. Return a JSON object with: optimizedPrompt, systemPrompt, explanation, improvements, and score.`
-        },
-        {
-          role: 'user',
-          content: `Original prompt: "${state.context.currentPrompt}"
-          
-Analysis: ${JSON.stringify(state.currentAnalysis, null, 2)}
+      // Use client-side AI service for optimization
+      const requestBody = {
+        originalPrompt: state.context.currentPrompt,
+        userResponses: state.context.userResponses,
+        category: state.currentAnalysis.category,
+        model: model
+      };
 
-User responses: ${JSON.stringify(state.context.userResponses, null, 2)}
-
-Please optimize this prompt for better AI interactions.`
-        }
-      ];
-
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages,
-          model,
-          stream: true,
-          temperature: 0.7,
-          maxTokens: 2000
-        }),
-        signal: abortControllerRef.current.signal
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error('No response body');
-
-      const decoder = new TextDecoder();
-      let buffer = '';
       let fullContent = '';
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      for await (const chunk of clientAIService.optimizePromptStream(requestBody)) {
+        fullContent += chunk;
+        setState(prev => ({ ...prev, streamingContent: fullContent }));
+      }
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
-
+      // Parse the optimization result from markdown-formatted content
+      let optimizationResult;
+      
+      // Extract the optimized prompt from the markdown content
+      const optimizedMatch = fullContent.match(/\*\*✨ Optimized Prompt:\*\*\n\n([\s\S]*?)(?=\n\n\*\*|$)/);
+      const improvementsMatch = fullContent.match(/\*\*🎯 Improvements Made:\*\*\n([\s\S]*?)(?=\n\n\*\*|$)/);
+      
+      let optimizedPrompt = '';
+      let improvements: string[] = [];
+      
+      if (optimizedMatch) {
+        optimizedPrompt = optimizedMatch[1].trim();
+      } else {
+        // Fallback: look for any substantial text after "Optimized Prompt"
+        const lines = fullContent.split('\n');
+        let capturing = false;
+        
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') break;
-            
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.content) {
-                fullContent += parsed.content;
-                setState(prev => ({ ...prev, streamingContent: fullContent }));
-              }
-              if (parsed.isComplete) break;
-            } catch (e) {
-              // Skip invalid JSON
-            }
+          if (line.includes('Optimized Prompt') || line.includes('optimized prompt')) {
+            capturing = true;
+            continue;
+          }
+          if (capturing && line.includes('**') && line.includes(':')) {
+            break; // Stop at next section
+          }
+          if (capturing && line.trim() && !line.startsWith('•') && !line.startsWith('-')) {
+            optimizedPrompt += line + '\n';
           }
         }
+        optimizedPrompt = optimizedPrompt.trim();
       }
-
-      // Parse the optimization result
-      let optimizationResult;
-      try {
-        const jsonMatch = fullContent.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          optimizationResult = JSON.parse(jsonMatch[0]);
-        } else {
-          optimizationResult = {
-            optimizedPrompt: fullContent,
-            explanation: 'AI-generated optimization',
-            improvements: ['Enhanced by AI'],
-            score: Math.min(100, state.currentAnalysis.score + 25)
-          };
-        }
-      } catch (parseError) {
-        optimizationResult = {
-          optimizedPrompt: fullContent,
-          explanation: 'AI-generated optimization',
-          improvements: ['Enhanced by AI'],
-          score: Math.min(100, state.currentAnalysis.score + 25)
-        };
+      
+      if (improvementsMatch) {
+        improvements = improvementsMatch[1]
+          .split('\n')
+          .filter(line => line.trim().startsWith('•'))
+          .map(line => line.replace(/^•\s*/, '').trim())
+          .filter(Boolean);
       }
+      
+      optimizationResult = {
+        optimizedPrompt: optimizedPrompt || fullContent,
+        explanation: 'AI-generated optimization with real-time analysis',
+        improvements: improvements.length > 0 ? improvements : ['Enhanced clarity', 'Improved structure', 'Added context'],
+        score: Math.min(100, state.currentAnalysis.score + 25)
+      };
 
       const optimized: OptimizedPrompt = {
         content: optimizationResult.optimizedPrompt,
-        systemPrompt: optimizationResult.systemPrompt,
+        systemPrompt: (optimizationResult as any).systemPrompt || undefined,
         explanation: optimizationResult.explanation,
         improvements: optimizationResult.improvements || [],
         structure: {
